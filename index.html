@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Attendance System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #f1c40f;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e8f4f8;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(174, 214, 241, 0.3) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(174, 214, 241, 0.3) 0%, transparent 20%);
+            color: var(--dark-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .bg-element {
+            position: absolute;
+            opacity: 0.1;
+            z-index: -1;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .bg-element:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            font-size: 5rem;
+            animation-delay: 0s;
+        }
+        
+        .bg-element:nth-child(2) {
+            top: 30%;
+            right: 8%;
+            font-size: 4rem;
+            animation-delay: 2s;
+        }
+        
+        .bg-element:nth-child(3) {
+            bottom: 20%;
+            left: 15%;
+            font-size: 6rem;
+            animation-delay: 4s;
+        }
+        
+        .bg-element:nth-child(4) {
+            bottom: 40%;
+            right: 20%;
+            font-size: 3rem;
+            animation-delay: 6s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-color), transparent);
+            animation: headerGlow 3s infinite;
+        }
+        
+        @keyframes headerGlow {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        
+        #app {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .role-selection {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .role-btn {
+            background: white;
+            color: var(--dark-color);
+            border: none;
+            padding: 1.5rem 3rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            min-width: 250px;
+            text-align: center;
+        }
+        
+        .role-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        
+        .class-selection {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        select, input[type="date"] {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-right: 1rem;
+            transition: all 0.3s;
+        }
+        
+        #attendance-sheet {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+            max-height: 500px;
+            overflow-y: auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        
+        .attendance-check {
+            transform: scale(1.5);
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+        
+        #submit-attendance {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 1rem auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        #back-btn {
+            background: var(--light-color);
+            color: var(--dark-color);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 2rem auto 0;
+        }
+        
+        .student-login {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 2rem auto;
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        @media (max-width: 768px) {
+            .role-selection {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .role-btn {
+                width: 100%;
+            }
+            
+            select, input[type="date"], button {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="bg-element"><i class="fas fa-book-open"></i></div>
+    <div class="bg-element"><i class="fas fa-graduation-cap"></i></div>
+    <div class="bg-element"><i class="fas fa-laptop-code"></i></div>
+    <div class="bg-element"><i class="fas fa-atom"></i></div>
+    
+    <div class="header">
+        <h1><i class="fas fa-chalkboard-teacher"></i> Digital Attendance System</h1>
+    </div>
+    
+    <div id="app">
+        
+        <div class="role-selection">
+            <button id="teacher-btn" class="role-btn"><i class="fas fa-user-tie"></i> I'm a Teacher</button>
+            <button id="student-btn" class="role-btn"><i class="fas fa-user-graduate"></i> I'm a Student</button>
+        </div>
+    </div>
+
+    <script>
+        // Generate 200 students
+        const students = {};
+        const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Davis", "Garcia", "Rodriguez", "Wilson"];
+        const firstNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Daniel",
+                           "Emily", "Hannah", "Madison", "Emma", "Olivia", "Abigail", "Isabella", "Sophia", "Elizabeth", "Chloe"];
+
+        for (let i = 1; i <= 200; i++) {
+            const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+            students[i] = {
+                name: `${firstName} ${lastName}`,
+                email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@university.edu`
+            };
+        }
+
+        // 5 Computer Science Subjects
+        const classes = {
+            "CS101": {
+                name: "Introduction to Computer Science",
+                students: Object.keys(students).slice(0, 40).map(id => ({id: parseInt(id), name: students[id].name})),
+                attendance: {}
+            },
+            "CS201": {
+                name: "Data Structures and Algorithms",
+                students: Object.keys(students).slice(40, 80).map(id => ({id: parseInt(id), name: students[id].name})),
+                attendance: {}
+            },
+            "CS301": {
+                name: "Database Systems",
+                students: Object.keys(students).slice(80, 120).map(id => ({id: parseInt(id), name: students[id].name})),
+                attendance: {}
+            },
+            "CS401": {
+                name: "Artificial Intelligence",
+                students: Object.keys(students).slice(120, 160).map(id => ({id: parseInt(id), name: students[id].name})),
+                attendance: {}
+            },
+            "CS501": {
+                name: "Computer Networks",
+                students: Object.keys(students).slice(160, 200).map(id => ({id: parseInt(id), name: students[id].name})),
+                attendance: {}
+            }
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('teacher-btn').addEventListener('click', renderTeacherView);
+            document.getElementById('student-btn').addEventListener('click', renderStudentView);
+        });
+
+        // Teacher View
+        function renderTeacherView() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <h1>Teacher Dashboard</h1>
+                <div class="class-selection">
+                    <h2>Select Class</h2>
+                    <select id="class-select">
+                        ${Object.keys(classes).map(code => 
+                            `<option value="${code}">${code} - ${classes[code].name}</option>`
+                        ).join('')}
+                    </select>
+                    <button id="load-class">Load Class</button>
+                </div>
+                <div id="attendance-sheet"></div>
+                <button id="submit-attendance" style="display:none;">Submit Attendance</button>
+                <button id="back-btn">Back to Home</button>
+            `;
+
+            document.getElementById('load-class').addEventListener('click', loadClassStudents);
+            document.getElementById('submit-attendance').addEventListener('click', submitAttendance);
+            document.getElementById('back-btn').addEventListener('click', renderHomePage);
+        }
+
+        function loadClassStudents() {
+            const classCode = document.getElementById('class-select').value;
+            const classData = classes[classCode];
+            
+            let html = `
+                <h2>${classData.name} - Attendance</h2>
+                <p>Date: <input type="date" id="attendance-date" value="${new Date().toISOString().split('T')[0]}"></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Present</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            classData.students.forEach(student => {
+                html += `
+                    <tr>
+                        <td>${student.id}</td>
+                        <td>${student.name}</td>
+                        <td><input type="checkbox" class="attendance-check" data-id="${student.id}"></td>
+                    </tr>
+                `;
+            });
+            
+            html += `</tbody></table>`;
+            
+            document.getElementById('attendance-sheet').innerHTML = html;
+            document.getElementById('submit-attendance').style.display = 'block';
+        }
+
+        function submitAttendance() {
+            const classCode = document.getElementById('class-select').value;
+            const date = document.getElementById('attendance-date').value;
+            const checks = document.querySelectorAll('.attendance-check');
+            
+            const attendanceRecord = {};
+            checks.forEach(check => {
+                const studentId = check.getAttribute('data-id');
+                attendanceRecord[studentId] = check.checked;
+            });
+            
+            if (!classes[classCode].attendance[date]) {
+                classes[classCode].attendance[date] = {};
+            }
+            
+            classes[classCode].attendance[date] = attendanceRecord;
+            alert('Attendance submitted successfully!');
+        }
+
+        // Student View
+        function renderStudentView() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <h1>Student Portal</h1>
+                <div class="student-login">
+                    <h2>Login</h2>
+                    <select id="student-select">
+                        ${Object.keys(students).map(id => 
+                            `<option value="${id}">${students[id].name} (${students[id].email})</option>`
+                        ).join('')}
+                    </select>
+                    <button id="student-login-btn">View Attendance</button>
+                </div>
+                <div id="student-attendance"></div>
+                <button id="back-btn">Back to Home</button>
+            `;
+            
+            document.getElementById('student-login-btn').addEventListener('click', viewStudentAttendance);
+            document.getElementById('back-btn').addEventListener('click', renderHomePage);
+        }
+
+        function viewStudentAttendance() {
+            const studentId = document.getElementById('student-select').value;
+            const studentName = students[studentId].name;
+            
+            let html = `<h2>Attendance Records for ${studentName}</h2>`;
+            html += `<table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Class</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            
+            // Find all attendance records for this student
+            Object.keys(classes).forEach(classCode => {
+                const classData = classes[classCode];
+                Object.keys(classData.attendance).forEach(date => {
+                    if (classData.attendance[date][studentId] !== undefined) {
+                        html += `
+                            <tr>
+                                <td>${date}</td>
+                                <td>${classData.name} (${classCode})</td>
+                                <td>${classData.attendance[date][studentId] ? 'Present' : 'Absent'}</td>
+                            </tr>
+                        `;
+                    }
+                });
+            });
+            
+            html += `</tbody></table>`;
+            
+            // Calculate attendance percentage
+            const allRecords = [];
+            Object.keys(classes).forEach(classCode => {
+                const classData = classes[classCode];
+                Object.keys(classData.attendance).forEach(date => {
+                    if (classData.attendance[date][studentId] !== undefined) {
+                        allRecords.push(classData.attendance[date][studentId]);
+                    }
+                });
+            });
+            
+            if (allRecords.length > 0) {
+                const presentCount = allRecords.filter(status => status).length;
+                const percentage = (presentCount / allRecords.length * 100).toFixed(2);
+                html += `<p>Overall Attendance: ${percentage}% (${presentCount}/${allRecords.length})</p>`;
+            } else {
+                html += `<p>No attendance records found</p>`;
+            }
+            
+            document.getElementById('student-attendance').innerHTML = html;
+        }
+
+        function renderHomePage() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <h1>Digital Attendance System</h1>
+                <div class="role-selection">
+                    <button id="teacher-btn" class="role-btn"><i class="fas fa-user-tie"></i> I'm a Teacher</button>
+                    <button id="student-btn" class="role-btn"><i class="fas fa-user-graduate"></i> I'm a Student</button>
+                </div>
+            `;
+            document.getElementById('teacher-btn').addEventListener('click', renderTeacherView);
+            document.getElementById('student-btn').addEventListener('click', renderStudentView);
+        }
+    </script>
+</body>
+</html>
